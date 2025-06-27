@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poster Creator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Arima:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: 'Arima', sans-serif;
+      background-color: #f0f0f0;
+    }
+
+    .poster-text {
+      font-size: 4rem;
+      line-height: 1.5;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      max-width: 2100px;
+      margin: 0 auto;
+      text-align: start;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+
+    .poster-bullet {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .poster-bullet::before {
+      content: "";
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+#dateText {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 6rem;
+  font-weight: bold;
+  color: white;
+  white-space: nowrap;         /* Prevents line breaks */
+  max-width: 2600px;
+  overflow: hidden;
+  text-overflow: ellipsis;     /* Optional: adds "..." if too long */
+}
+
+
+    #title2Section {
+      margin-top: 3rem; /* Gap above Title 2 */
+    }
+
+    textarea {
+      font-family: 'Arima', sans-serif;
+    }
+  </style>
+</head>
+<body class="p-4">
+  <div class="mb-4">
+    <textarea id="input1" rows="6" placeholder="Enter Title 1 Content" class="w-full p-2 border border-gray-400 rounded mb-2"></textarea>
+    <textarea id="input2" rows="6" placeholder="Enter Title 2 Content" class="w-full p-2 border border-gray-400 rounded mb-2"></textarea>
+    <textarea id="input3" rows="2" placeholder="Enter Date Text" class="w-full p-2 border border-gray-400 rounded"></textarea>
+    <div class="mt-4">
+      <button onclick="downloadPoster()" class="bg-green-600 text-white px-4 py-2 rounded">Download</button>
+    </div>
+  </div>
+
+  <div id="posterPreviewWrapper" class="overflow-auto border border-gray-400 p-2">
+    <div id="posterScalePreview" class="scale-[0.3] origin-top-left">
+      <div id="poster" class="relative w-[2700px] text-black" style="background: url('bg.png') no-repeat center; background-size: cover;">
+        <img src="header.png" class="w-full" />
+
+        <div class="relative">
+          <img src="datebox.png" class="w-full" />
+          <div id="dateText"></div>
+        </div>
+
+        <img src="title1.png" class="w-full" />
+        <div id="text1" class="poster-text"></div>
+
+        <!-- Title 2 Section -->
+        <div id="title2Section">
+          <img id="title2Image" src="title2.png" class="w-full" />
+          <div id="text2" class="poster-text"></div>
+        </div>
+
+        <img src="footer.png" class="w-full" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function generateBulletText(input) {
+      return input
+        .split('\n')
+        .map(line => line.trim() ? `<div class="poster-bullet">${line}</div>` : '')
+        .join('');
+    }
+
+    function generatePoster() {
+      const input1 = document.getElementById('input1').value.trim();
+      const input2 = document.getElementById('input2').value.trim();
+      const input3 = document.getElementById('input3').value;
+
+      // Date text
+      document.getElementById('dateText').innerText = input3;
+
+      // Title 1 content
+      document.getElementById('text1').innerHTML = generateBulletText(input1);
+
+      // Title 2 logic
+      const title2Section = document.getElementById('title2Section');
+      const text2Block = document.getElementById('text2');
+      const title2Image = document.getElementById('title2Image');
+
+      if (input2 === '') {
+        title2Section.style.display = 'none'; // Hide entire block to prevent overflow
+      } else {
+        title2Section.style.display = 'block';
+        text2Block.innerHTML = generateBulletText(input2);
+      }
+
+      document.getElementById('posterScalePreview').style.transform = "scale(0.3)";
+    }
+
+    function downloadPoster() {
+      const wrapper = document.getElementById("posterScalePreview");
+      const originalTransform = wrapper.style.transform;
+
+      wrapper.style.transform = "scale(1)";
+      wrapper.style.transformOrigin = "top left";
+
+      html2canvas(document.getElementById("poster"), {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null
+      }).then(canvas => {
+        wrapper.style.transform = originalTransform;
+
+        const link = document.createElement("a");
+        link.download = "poster.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+
+    ['input1', 'input2', 'input3'].forEach(id => {
+      document.getElementById(id).addEventListener('input', generatePoster);
+    });
+  </script>
+</body>
+</html>
