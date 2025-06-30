@@ -4,9 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Poster Creator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Arima:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Arima:wght@100..700&family=Noto+Sans+Malayalam:wght@100..900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind and html2canvas -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
   <style>
     body {
       font-family: 'Arima', sans-serif;
@@ -25,36 +32,58 @@
       overflow-wrap: break-word;
     }
 
-    .poster-bullet {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-    }
+.poster-bullet {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-size: 4rem;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  position: relative;
+  padding-left: 3.5rem;
+}
 
-    .poster-bullet::before {
-      content: "";
-      font-weight: bold;
-      flex-shrink: 0;
-    }
-
-#dateText {
+.poster-bullet::before {
+  content: '';
   position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  font-size: 6rem;
-  font-weight: bold;
-  color: white;
-  white-space: nowrap;         /* Prevents line breaks */
-  max-width: 2600px;
-  overflow: hidden;
-  text-overflow: ellipsis;     /* Optional: adds "..." if too long */
+  left: 0;
+  top: 0;
+  bottom: -70px;
+  margin: auto 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  background-image: url('bullet.png');
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 
+    .poster-bullet img {
+      width: 2.5rem;
+      height: 2.5rem;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+
+    #dateText {
+      font-family: 'Noto Sans Malayalam', sans-serif;
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-size: 6rem;
+      font-weight: bold;
+      color: white;
+      white-space: nowrap;
+      max-width: 2600px;
+      overflow: visible;
+      text-overflow: ellipsis;
+    }
+
     #title2Section {
-      margin-top: 3rem; /* Gap above Title 2 */
+      margin-top: 3rem;
     }
 
     textarea {
@@ -66,7 +95,7 @@
   <div class="mb-4">
     <textarea id="input1" rows="6" placeholder="Enter Title 1 Content" class="w-full p-2 border border-gray-400 rounded mb-2"></textarea>
     <textarea id="input2" rows="6" placeholder="Enter Title 2 Content" class="w-full p-2 border border-gray-400 rounded mb-2"></textarea>
-    <textarea id="input3" rows="2" placeholder="Enter Date Text" class="w-full p-2 border border-gray-400 rounded"></textarea>
+    <textarea id="input3" rows="2" placeholder="Enter Date Text" class="w-full p-2 border border-gray-400 rounded">1447 മുഹറം 01 | തിങ്കള്‍ | 2025 ജനുവരി 01</textarea>
     <div class="mt-4">
       <button onclick="downloadPoster()" class="bg-green-600 text-white px-4 py-2 rounded">Download</button>
     </div>
@@ -85,7 +114,6 @@
         <img src="title1.png" class="w-full" />
         <div id="text1" class="poster-text"></div>
 
-        <!-- Title 2 Section -->
         <div id="title2Section">
           <img id="title2Image" src="title2.png" class="w-full" />
           <div id="text2" class="poster-text"></div>
@@ -97,31 +125,27 @@
   </div>
 
   <script>
-    function generateBulletText(input) {
-      return input
-        .split('\n')
-        .map(line => line.trim() ? `<div class="poster-bullet">${line}</div>` : '')
-        .join('');
-    }
+function generateBulletText(input) {
+  return input
+    .split('\n')
+    .map(line => line.trim() ? `<div class="poster-bullet">${line}</div>` : '')
+    .join('');
+}
+
 
     function generatePoster() {
       const input1 = document.getElementById('input1').value.trim();
       const input2 = document.getElementById('input2').value.trim();
       const input3 = document.getElementById('input3').value;
 
-      // Date text
       document.getElementById('dateText').innerText = input3;
-
-      // Title 1 content
       document.getElementById('text1').innerHTML = generateBulletText(input1);
 
-      // Title 2 logic
       const title2Section = document.getElementById('title2Section');
       const text2Block = document.getElementById('text2');
-      const title2Image = document.getElementById('title2Image');
 
       if (input2 === '') {
-        title2Section.style.display = 'none'; // Hide entire block to prevent overflow
+        title2Section.style.display = 'none';
       } else {
         title2Section.style.display = 'block';
         text2Block.innerHTML = generateBulletText(input2);
@@ -154,6 +178,8 @@
     ['input1', 'input2', 'input3'].forEach(id => {
       document.getElementById(id).addEventListener('input', generatePoster);
     });
+
+    window.onload = generatePoster;
   </script>
 </body>
 </html>
